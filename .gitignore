@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+.codex/
+.env
+.env.*
+auth.json
+config.toml
+models_cache.json
+backups/
+*.events.jsonl
+*.log

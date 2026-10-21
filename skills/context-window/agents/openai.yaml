@@ -1,0 +1,6 @@
+interface:
+  display_name: "上下文设置（GPT专属）"
+  short_description: "GPT专属：调整全部或指定模型的窗口、有效比例和压缩阈值，支持刷新与恢复"
+  default_prompt: "使用 $context-window 按我指定的范围调整窗口、有效比例或压缩阈值，保持未指定项不变，并说明何时生效。"
+policy:
+  allow_implicit_invocation: true
