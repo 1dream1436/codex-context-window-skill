@@ -2,7 +2,7 @@
 name: context-window
 description: Configure context window token limits, effective context percentages, and auto-compaction thresholds for all or selected models in Windows ChatGPT Work Local and Codex Local. Inspect settings, refresh model catalogs, preview, back up and restore local configuration. 用于调整上下文窗口、有效比例与自动压缩阈值；不用于单会话、普通Chat云端或其他客户端。
 metadata:
-  version: 0.4.0
+  version: 0.4.1
 ---
 
 # 上下文设置（GPT专属）
@@ -28,16 +28,18 @@ metadata:
 
 ## 调用
 
-使用现有可用终端调用Python脚本，不要求PowerShell 7；Windows PowerShell、PowerShell或命令提示符等均可。`scripts/context_window.py`仅依赖Python 3.11+标准库，复用已有Python，不重新安装。先用`status`核对当前目录、全局覆盖、上限、比例、压缩与计数范围。脚本相对技能目录调用；先确认可用的Python 3.11+解释器，不依赖作者机器上的路径。
+优先调用发布包内的 `bin/context_window.exe`，无需用户安装Python、创建虚拟环境或安装第三方包，也不要求PowerShell 7。复用现有终端，不安装或更换终端。先用`status`核对当前目录、全局覆盖、上限、比例、压缩与计数范围。路径相对技能目录；所有命令参数与源码脚本相同。
 
-示例（python须指向已确认的3.11+解释器；模型id需先核对）：
+若使用Git源码版且没有EXE，可复用助手或客户端已有的兼容Python运行 `scripts/context_window.py`；不要把额外安装Python或新建环境作为默认步骤。没有EXE且没有可用运行时，应提示使用含独立程序的Windows发布包。Python版本属于源码开发要求，不是Windows发布包的安装前提。
+
+示例（以下为PowerShell写法；模型id需先核对；其他终端按其路径语法调用同一EXE）：
 
 ```powershell
-python scripts/context_window.py status
-python scripts/context_window.py set --scope global-model --model gpt-6.1-sol --tokens 60万 --effective-percent 95 --auto-compact-limit 50万 --preview
-python scripts/context_window.py set --scope global-model --model gpt-6.1-sol --tokens 60万 --effective-percent 95 --auto-compact-limit 50万
-python scripts/context_window.py set --scope global-model --model gpt-6.1-sol --effective-percent 90
-python scripts/context_window.py set --scope global-all --auto-compact-limit default
+.\bin\context_window.exe status
+.\bin\context_window.exe set --scope global-model --model gpt-6.1-sol --tokens 60万 --effective-percent 95 --auto-compact-limit 50万 --preview
+.\bin\context_window.exe set --scope global-model --model gpt-6.1-sol --tokens 60万 --effective-percent 95 --auto-compact-limit 50万
+.\bin\context_window.exe set --scope global-model --model gpt-6.1-sol --effective-percent 90
+.\bin\context_window.exe set --scope global-all --auto-compact-limit default
 ```
 
 `--home`位于子命令前，可指定隔离配置目录；默认遵守CODEX_HOME，否则使用用户的`.codex`。`--preview`不写配置、目录或备份，仅可能建立短暂锁目录。明确的修改指令已授权对应写入，不额外要求用户批准预览。
@@ -58,12 +60,12 @@ python scripts/context_window.py set --scope global-all --auto-compact-limit def
 
 ```powershell
 # 本机已获取的模型资料（默认）
-python scripts/context_window.py refresh
+.\bin\context_window.exe refresh
 # 当前已安装Codex附带的内置资料
-python scripts/context_window.py refresh --refresh-from-bundled
-python scripts/context_window.py refresh --refresh-from-bundled --apply
+.\bin\context_window.exe refresh --refresh-from-bundled
+.\bin\context_window.exe refresh --refresh-from-bundled --apply
 # 已核对的JSON目录
-python scripts/context_window.py refresh --source C:\path\models.json
+.\bin\context_window.exe refresh --source C:\path\models.json
 ```
 
 内置来源使用已有`codex debug models --bundled`；找不到命令时用`--codex`指定本机已有可执行文件绝对路径，不下载。该选项只与`--refresh-from-bundled`同用，且不能与`--source`混用。内置资料和账户缓存可能不同；内置目录不是账号权限证明，也不保证比缓存更新。

@@ -1,4 +1,5 @@
 """Build a deterministic, allowlisted skill archive using only the standard library."""
+import argparse
 import hashlib
 from pathlib import Path
 import re
@@ -12,12 +13,19 @@ def version():
     return re.search(r'^VERSION = "([0-9]+\.[0-9]+\.[0-9]+)"$',
                      (SKILL / 'scripts/context_window.py').read_text(encoding='utf-8'), re.M)[1]
 
-def build():
+def build(executable=None):
     output = ROOT / 'dist'
     output.mkdir(exist_ok=True)
-    target = output / f'context-window-{version()}.zip'
+    suffix = '-windows-x64' if executable else ''
+    target = output / f'context-window-{version()}{suffix}.zip'
     contents = {f'context-window/{name}': (SKILL / name).read_bytes() for name in FILES}
     contents['context-window/LICENSE'] = (ROOT / 'LICENSE').read_bytes()
+    if executable:
+        executable = Path(executable)
+        data = executable.read_bytes()
+        if not data.startswith(b'MZ'):
+            raise ValueError('Expected a Windows executable')
+        contents['context-window/bin/context_window.exe'] = data
     with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
         for name, data in sorted(contents.items()):
             entry = zipfile.ZipInfo(name, date_time=(2020, 1, 1, 0, 0, 0))
@@ -34,4 +42,6 @@ def build():
     return target
 
 if __name__ == '__main__':
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--executable', type=Path, help='Include a built Windows x64 executable')
+    build(parser.parse_args().executable)

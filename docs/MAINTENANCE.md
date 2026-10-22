@@ -18,4 +18,6 @@
 4. 提交英文说明，推送后确认 GitHub CI 通过。
 5. 在通过检查的提交上建立 `vX.Y.Z` 标签，创建 GitHub Release，上传 ZIP 和 SHA-256 校验文件，发布说明列出验证边界。
 
-本仓库没有自动调用模型或自动发布工作流。维护者审核通过的提交后再发布，避免仅推送标签就产生未经验证的发行包。
+本仓库不自动调用模型。发布GitHub Release后，`release.yml` 在Windows运行隔离测试和发布检查，使用固定版本PyInstaller打包独立EXE，清空PATH后验证查询、预览、写入及恢复，再上传Windows x64技能ZIP和SHA-256校验文件。普通推送不会发布新版本。
+
+开发者仍使用Python 3.11+；它不再是Windows发布包用户的安装前提。EXE只在Windows runner生成，不提交进Git。若构建失败，修复后通过workflow_dispatch传入既有tag重试；工作流只在全部检查通过后上传，不覆盖已存在的资产。

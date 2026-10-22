@@ -20,7 +20,7 @@ import tomllib
 from contextlib import contextmanager
 from pathlib import Path
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 SCOPES = ("global-all", "global-model")
 FIELDS = ("context_window", "max_context_window", "effective_context_window_percent", "auto_compact_token_limit")
 

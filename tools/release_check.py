@@ -9,7 +9,8 @@ REQUIRED = {
     '.gitignore', '.gitattributes', 'docs/VALIDATION.md', 'docs/MAINTENANCE.md',
     'tests/test_context_window.py', 'tools/build_release.py', 'tools/release_check.py',
     '.github/workflows/ci.yml', '.github/ISSUE_TEMPLATE/bug_report.md',
-    '.github/pull_request_template.md',
+    '.github/pull_request_template.md', '.github/workflows/release.yml',
+    'tools/smoke_executable.py',
 } | {f'skills/context-window/{name}' for name in FILES}
 SKIP = {'.git', '__pycache__', 'dist'}
 FORBIDDEN_NAMES = {'auth.json', 'config.toml', 'models_cache.json', '.env', 'manifest.json'}

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-22
+
+- Ship a Windows x64 standalone executable in the release ZIP so users do not need a separate Python installation or virtual environment.
+- Prefer the bundled executable in skill instructions; keep the Python source entry point for developers.
+- Remove the PowerShell 7 prerequisite and add the English guide, search terms, and documented Work Local / Codex Local results.
+- Build and smoke-test the executable on Windows before uploading release assets; do not change context-setting behavior.
+
+
 ### Documentation - 2026-10-22
 
 - Add an English guide covering ChatGPT Work Local, Codex Local, context token limits, effective percentages, auto-compaction, installation, and runtime verification.

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/1dream1436/codex-context-window-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/1dream1436/codex-context-window-skill/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+![Windows x64 standalone](https://img.shields.io/badge/Windows-x64_standalone-blue)
 
 在 Windows 本地 ChatGPT Work / Codex 中，用自然语言调整上下文窗口、有效比例和自动压缩阈值。支持全部模型或指定模型、模型资料刷新、预览、备份与恢复。
 
@@ -16,7 +16,7 @@
 
 ### What this skill configures
 
-This unofficial OpenAI Codex agent skill manages the shared local Codex configuration used by **ChatGPT Work Local** and **Codex Local** on Windows. Use natural-language requests or the Python command line to change:
+This unofficial OpenAI Codex agent skill manages the shared local Codex configuration used by **ChatGPT Work Local** and **Codex Local** on Windows. Use natural-language requests or the bundled command-line executable to change:
 
 - **Context window / token limit** (`--tokens`): configure the raw context size, for example `500k` or `600k`, subject to the current model catalog and client limits.
 - **Effective context percentage** (`--effective-percent`): set the percentage used to calculate the client's expected usable context window.
@@ -36,9 +36,9 @@ This is a community project, not affiliated with OpenAI. Local settings do not i
 
 ### Requirements and installation
 
-Use Windows, an existing local ChatGPT Work / Codex environment, and **Python 3.11+**. The runtime uses only the Python standard library. **PowerShell 7 is not required**: invoke the Python script from an available terminal, including Windows PowerShell, PowerShell, or Command Prompt. The PowerShell installation example below uses standard commands and does not require version 7.
+Use Windows x64 and an existing local ChatGPT Work / Codex environment. **The Windows release ZIP includes a standalone executable: no separate Python installation, virtual environment, third-party Python packages, or PowerShell 7 is required.** Use your existing terminal; the agent invokes the bundled executable.
 
-Download the skill ZIP from [Releases](https://github.com/1dream1436/codex-context-window-skill/releases) and copy its `context-window` folder into the skill directory supported by your client, usually `.agents/skills` under your user directory. Some installations also recognize `.codex/skills`. Install only one copy, reload skills or open a new chat, and confirm that `$context-window` is available. To obtain the latest instruction changes, use `skills/context-window` from the `main` branch; an existing release ZIP reflects its release tag.
+Download the skill ZIP from [Releases](https://github.com/1dream1436/codex-context-window-skill/releases) and copy its `context-window` folder into the skill directory supported by your client, usually `.agents/skills` under your user directory. Some installations also recognize `.codex/skills`. Install only one copy, reload skills or open a new chat, and confirm that `$context-window` is available. Choose `context-window-0.4.1-windows-x64.zip` for installation without Python. Git source checkouts do not include generated executables; source developers may use an existing Python 3.11+ runtime instead.
 
 ### Usage examples
 
@@ -52,16 +52,16 @@ Restore the selected model's default auto-compaction threshold.
 Preview a model catalog refresh from my installed Codex bundled metadata.
 ```
 
-Or run from the repository root, replacing `MODEL_ID` with an exact ID returned by `status`:
+Or run from the installed `context-window` folder, replacing `MODEL_ID` with an exact ID returned by `status` (PowerShell path syntax shown):
 
-```text
-python skills/context-window/scripts/context_window.py status
-python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k --preview
-python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k
-python skills/context-window/scripts/context_window.py set --scope global-all --effective-percent 90
-python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --auto-compact-limit default
-python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled
-python skills/context-window/scripts/context_window.py restore "PATH_TO_BACKUP_MANIFEST"
+```powershell
+.\bin\context_window.exe status
+.\bin\context_window.exe set --scope global-model --model MODEL_ID --tokens 600k --preview
+.\bin\context_window.exe set --scope global-model --model MODEL_ID --tokens 600k
+.\bin\context_window.exe set --scope global-all --effective-percent 90
+.\bin\context_window.exe set --scope global-model --model MODEL_ID --auto-compact-limit default
+.\bin\context_window.exe refresh --refresh-from-bundled
+.\bin\context_window.exe restore "PATH_TO_BACKUP_MANIFEST"
 ```
 
 `--home PATH` goes before the subcommand and selects an isolated configuration directory. Otherwise, the script uses `CODEX_HOME`, falling back to `.codex` under the user directory. `refresh` previews by default; add `--apply` to save a refresh. Bundled refresh requires an installed Codex supporting `debug models --bundled`.
@@ -77,11 +77,13 @@ A result of `saved_requires_reload` means the configuration was saved. Open a ne
 - 对全部模型生效，或只调整当前目录中的一个精确模型 ID。
 - 从本机缓存、已安装 Codex 的内置资料或指定 JSON 刷新目录，并保留已记录的自定义选择。
 - 写入前备份，检查哈希，遇到冲突时停止；支持按事务恢复。
-- 仅依赖 Python 3.11+ 标准库，无须安装 Python 第三方包。
+- Windows x64发布包内含独立运行程序，无须另装Python、创建虚拟环境或安装第三方包。
 
 ## 安装
 
-需要 Windows、已有的本地 ChatGPT Work / Codex 环境及 Python 3.11+。不要求 PowerShell 7；可从现有终端（Windows PowerShell、PowerShell 或命令提示符等）调用 Python 脚本。下方安装示例使用 PowerShell 通用命令。请先确认 `python --version`；若命令指向其他版本，换成你已安装的解释器路径。
+需要Windows x64及已有的本地ChatGPT Work / Codex环境。下载 `context-window-0.4.1-windows-x64.zip` 后解压安装，助手直接调用包内的 `bin/context_window.exe`。**无须额外安装Python或PowerShell 7，也无须配置虚拟环境。**
+
+Git源码版不含生成的EXE；源码开发者可复用已有Python 3.11+运行脚本。没有运行时的普通用户请使用Windows发布包。以下克隆安装方式适用于源码使用者；推荐普通用户直接下载发布包。
 
 从 [Releases](https://github.com/1dream1436/codex-context-window-skill/releases) 下载技能 ZIP，将其中的 `context-window` 文件夹放入你的技能目录。也可以克隆仓库：
 
@@ -111,16 +113,16 @@ Copy-Item -Recurse './skills/context-window' $target
 
 ## 直接使用命令
 
-以下命令在仓库根目录执行；`MODEL_ID` 需替换为当前目录中的精确 ID，数值仅作示例，并非适用于全部模型。
+以下命令在已安装的 `context-window` 目录执行（PowerShell路径写法）；`MODEL_ID` 需替换为当前目录中的精确 ID，数值仅作示例，并非适用于全部模型。
 
 ```powershell
-python skills/context-window/scripts/context_window.py status
-python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k --effective-percent 95 --auto-compact-limit 500k --preview
-python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k --effective-percent 95 --auto-compact-limit 500k
-python skills/context-window/scripts/context_window.py set --scope global-all --auto-compact-limit default
-python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled
-python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled --apply
-python skills/context-window/scripts/context_window.py restore "PATH_TO_BACKUP_MANIFEST"
+.\bin\context_window.exe status
+.\bin\context_window.exe set --scope global-model --model MODEL_ID --tokens 600k --effective-percent 95 --auto-compact-limit 500k --preview
+.\bin\context_window.exe set --scope global-model --model MODEL_ID --tokens 600k --effective-percent 95 --auto-compact-limit 500k
+.\bin\context_window.exe set --scope global-all --auto-compact-limit default
+.\bin\context_window.exe refresh --refresh-from-bundled
+.\bin\context_window.exe refresh --refresh-from-bundled --apply
+.\bin\context_window.exe restore "PATH_TO_BACKUP_MANIFEST"
 ```
 
 `--home PATH` 放在子命令之前，可在隔离目录操作；省略时使用 `CODEX_HOME`，未设置则使用用户目录下 `.codex`。需要内置刷新时，已有 Codex 必须支持 `debug models --bundled`；不在 PATH 中可加 `--codex` 指定现有程序。
@@ -147,6 +149,8 @@ python skills/context-window/scripts/context_window.py restore "PATH_TO_BACKUP_M
 发布前已完成 **33 项隔离测试、8 个正式真实模型回合，观察到 2 次自动压缩完成**；后续另完成 **4 个用户从 Work Local / Codex Local 界面发起的窗口对照回合**。压缩证据来自最初的引擎测试，双界面补测仅确认窗口同步，不扩大为两个界面的压缩参数均已验证。未测试所有模型或 60 万长输入极限。详见 [验证范围](docs/VALIDATION.md)。
 
 ## 开发与贡献
+
+以下Python 3.11+要求仅用于源码开发、测试与构建，普通用户使用Windows独立发布包无需安装Python。源码调用方式为 `python skills/context-window/scripts/context_window.py ...`。
 
 ```powershell
 python -m unittest discover -s tests -v
