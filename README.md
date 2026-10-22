@@ -4,13 +4,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Windows x64 standalone](https://img.shields.io/badge/Windows-x64_standalone-blue)
 
-在 Windows 本地 ChatGPT Work / Codex 中，用自然语言调整上下文窗口、有效比例和自动压缩阈值。支持全部模型或指定模型、模型资料刷新、预览、备份与恢复。
+在 Windows 本地 ChatGPT Work / Codex 中，用自然语言调整上下文窗口、有效比例和自动压缩阈值。支持全部模型或指定模型、模型资料刷新、预览、备份与恢复。**Windows x64 发布包内置独立程序，无需安装 Python 或配置虚拟环境。**
 
-**Configure the context window token limit, effective context percentage, and auto-compaction threshold in Windows ChatGPT Work Local and Codex Local using an installable agent skill.** Apply settings to all models or one selected model, preview changes, refresh the model catalog, and back up or restore configuration.
+**Configure the context window token limit, effective context percentage, and auto-compaction threshold in Windows ChatGPT Work Local and Codex Local using an installable agent skill.** Apply settings to all models or one selected model, preview changes, refresh the model catalog, and back up or restore configuration. **The Windows x64 release includes a standalone executable; no Python setup is needed.**
 
-[English guide](#english-guide) · [中文说明](#能做什么)
+[English guide](#english-guide) · [中文说明](#能做什么) · [FAQ / 常见问题](#faq--常见问题)
 
-**Verified in both desktop modes:** 500K raw → 475K effective and 600K raw → 570K effective at 95%. These are observed local configuration results, not a guarantee of server-side capacity or long-input performance. See [validation evidence and reproduction steps](docs/VALIDATION.md#work-local-与-codex-local-双界面验证).
+**双界面验证 / Verified in both desktop modes:** 500K raw → 475K effective and 600K raw → 570K effective at 95%. These are observed local configuration results, not a guarantee of server-side capacity or long-input performance. See [validation evidence and reproduction steps](docs/VALIDATION.md#work-local-与-codex-local-双界面验证).
 
 ## English guide
 
@@ -147,6 +147,44 @@ Copy-Item -Recurse './skills/context-window' $target
 当前实现按已核对客户端的规则处理窗口上限与压缩限制；配置不会突破服务端能力。模型目录、账户权限和客户端版本可能不同。刷新内置资料也不代表取得新模型权限。
 
 发布前已完成 **33 项隔离测试、8 个正式真实模型回合，观察到 2 次自动压缩完成**；后续另完成 **4 个用户从 Work Local / Codex Local 界面发起的窗口对照回合**。压缩证据来自最初的引擎测试，双界面补测仅确认窗口同步，不扩大为两个界面的压缩参数均已验证。未测试所有模型或 60 万长输入极限。详见 [验证范围](docs/VALIDATION.md)。
+
+## FAQ / 常见问题
+
+### 如何修改 Codex Desktop 的上下文窗口或 Token 上限？ / How do I change the Codex Desktop context window or token limit?
+
+安装 Windows 发布包后，让助手使用 `$context-window` 查询配置，再指定模型和窗口大小，例如“只把指定模型的上下文窗口设为 600k，其他参数不变”。支持全部模型或一个精确模型 ID。命令行示例见[直接使用命令](#直接使用命令)。
+
+Install the Windows release, ask your agent to inspect settings with `$context-window`, then specify the model and raw token limit. For example: “Set only the selected model's context window to 600k; keep other settings unchanged.” See [usage examples](#usage-examples) for the executable commands.
+
+### ChatGPT Work Local 和 Codex Local 的上下文设置通用吗？ / Do ChatGPT Work Local and Codex Local share context settings?
+
+在已验证的 Windows 环境中，两者读取相同用户配置：同一模型、同一配置目录且没有额外覆盖时，修改后的新聊天使用相同窗口。500K 原始窗口对应 475K 有效窗口，600K 对应 570K（95% 有效比例）。不按两个模式分别存储窗口。详见[双界面验证](#work-local-与-codex-local)。
+
+In the documented Windows environment, both modes use shared user settings when the model, configuration directory and overrides match. New chats showed 475K effective context for 500K raw and 570K for 600K raw at 95%. Separate per-mode window settings are not provided. See [desktop verification and scope](#desktop-verification-and-scope).
+
+### 如何调整自动压缩触发阈值？ / How do I set the auto-compaction threshold?
+
+指定 `--auto-compact-limit`，或直接说“把指定模型的自动压缩阈值设为 500k”。用 `default` 恢复默认；未指定的窗口和有效比例保持不变。阈值受模型目录和客户端规则限制，不能任意设大或据此关闭自动压缩。
+
+Use `--auto-compact-limit` or ask the agent to set the automatic context compression threshold for the selected model. Use `default` to restore the default. The skill preserves unspecified parameters and checks the applicable limits; it does not provide an unlimited threshold or disable automatic compaction.
+
+### 有效上下文比例与自动压缩阈值有什么区别？ / What is the effective context percentage versus the compaction threshold?
+
+有效比例决定客户端预计可用窗口：例如 600K × 95% = 570K。自动压缩阈值决定何时尝试整理历史。二者可分别调整；“60万”始终表示 600000 个原始 token，不是承诺可用 60 万。
+
+The effective percentage determines the expected usable window, such as 600K × 95% = 570K. The compaction threshold controls when the client attempts to compact history. They are separate controls; a raw token setting is not a guarantee of that many usable tokens.
+
+### 需要安装 Python 或 PowerShell 7 吗？ / Can I use this skill without installing Python?
+
+使用 `context-window-0.4.1-windows-x64.zip` 无需另装 Python、创建虚拟环境或安装 PowerShell 7。包内的 `bin/context_window.exe` 可直接由助手调用。GitHub 自动生成的 Source code 压缩包和 Git 源码不含 EXE；免环境安装请选择[Release 安装包](https://github.com/1dream1436/codex-context-window-skill/releases/latest)。
+
+The Windows x64 release includes `bin/context_window.exe` and requires no separate Python installation, virtual environment or PowerShell 7. Choose the Windows ZIP from [Releases](https://github.com/1dream1436/codex-context-window-skill/releases/latest), not GitHub's automatically generated Source code archives. Python 3.11+ applies only when running or developing the source script.
+
+### 修改后为什么旧聊天没有变化？能突破模型的服务端上限吗？ / Why is my existing chat unchanged, and does this unlock server-side capacity?
+
+保存配置不代表旧聊天已应用；按需要新建聊天或重新加载，再从真实运行记录核对。这个项目只调整本机配置，不增加服务端容量或模型权限，也不调整普通 Chat 云端聊天。参见[生效与限制](#生效与限制)。
+
+Saving settings does not prove an existing chat has applied them. Open a new chat or reload as appropriate and check actual runtime records. This local configuration skill does not increase server-side capacity, grant model access, or change regular cloud Chat. See [validation scope](docs/VALIDATION.md).
 
 ## 开发与贡献
 
