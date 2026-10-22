@@ -1,4 +1,4 @@
-# Codex Context Window Skill
+# Codex Context Window Skill — ChatGPT Work Local & Codex Local
 
 [![CI](https://github.com/1dream1436/codex-context-window-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/1dream1436/codex-context-window-skill/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -6,7 +6,68 @@
 
 在 Windows 本地 ChatGPT Work / Codex 中，用自然语言调整上下文窗口、有效比例和自动压缩阈值。支持全部模型或指定模型、模型资料刷新、预览、备份与恢复。
 
-**This is an unofficial Windows-local Codex skill for context settings, catalog refresh, and transactional restore. It does not increase server-side model capacity.**
+**Configure the context window token limit, effective context percentage, and auto-compaction threshold in Windows ChatGPT Work Local and Codex Local using an installable agent skill.** Apply settings to all models or one selected model, preview changes, refresh the model catalog, and back up or restore configuration.
+
+[English guide](#english-guide) · [中文说明](#能做什么)
+
+**Verified in both desktop modes:** 500K raw → 475K effective and 600K raw → 570K effective at 95%. These are observed local configuration results, not a guarantee of server-side capacity or long-input performance. See [validation evidence and reproduction steps](docs/VALIDATION.md#work-local-与-codex-local-双界面验证).
+
+## English guide
+
+### What this skill configures
+
+This unofficial OpenAI Codex agent skill manages the shared local Codex configuration used by **ChatGPT Work Local** and **Codex Local** on Windows. Use natural-language requests or the Python command line to change:
+
+- **Context window / token limit** (`--tokens`): configure the raw context size, for example `500k` or `600k`, subject to the current model catalog and client limits.
+- **Effective context percentage** (`--effective-percent`): set the percentage used to calculate the client's expected usable context window.
+- **Auto-compaction / automatic context compression threshold** (`--auto-compact-limit`): choose when the client should attempt context compaction, or restore the model default.
+- **Global or per-model settings**: target all models (`global-all`) or one exact model ID (`global-model`), while preserving unspecified parameters.
+- **Model catalog refresh, preview, backup and restore**: refresh metadata from the local cache, installed Codex bundled catalog, or a supplied JSON file; preserve recorded custom choices and check for conflicting changes before writing.
+
+Related configuration terms include `config.toml`, `model_context_window`, `model_auto_compact_token_limit`, and `context_window` model metadata. The skill handles the configuration changes rather than requiring users to edit these files manually.
+
+### Desktop verification and scope
+
+In the documented Windows test, new chats opened from both ChatGPT Work Local and Codex Local used 475K effective context for a 500K raw setting and 570K for a 600K raw setting. The test used a 95% effective percentage and Codex engine `0.163.0-alpha.11`. Both modes read shared user settings when the model, configuration directory, and overrides match; the skill does not store separate window sizes for Work and Codex modes.
+
+The desktop test verifies context-window values in real runtime records. It does not establish that every model supports those sizes, that old chats update automatically, or that both desktop interfaces have separately passed compaction-threshold tests. Earlier engine tests observed automatic compaction; see [validation scope](docs/VALIDATION.md) for the distinction.
+
+This is a community project, not affiliated with OpenAI. Local settings do not increase server-side model capacity or grant access to models. Regular cloud Chat mode, other clients, and per-conversation configuration are outside this project's scope.
+
+### Requirements and installation
+
+Use Windows, an existing local ChatGPT Work / Codex environment, and **Python 3.11+**. The runtime uses only the Python standard library. **PowerShell 7 is not required**: invoke the Python script from an available terminal, including Windows PowerShell, PowerShell, or Command Prompt. The PowerShell installation example below uses standard commands and does not require version 7.
+
+Download the skill ZIP from [Releases](https://github.com/1dream1436/codex-context-window-skill/releases) and copy its `context-window` folder into the skill directory supported by your client, usually `.agents/skills` under your user directory. Some installations also recognize `.codex/skills`. Install only one copy, reload skills or open a new chat, and confirm that `$context-window` is available. To obtain the latest instruction changes, use `skills/context-window` from the `main` branch; an existing release ZIP reflects its release tag.
+
+### Usage examples
+
+Ask your agent:
+
+```text
+Use $context-window to inspect my current context window settings.
+Set only the selected model's context window to 600k; keep other settings unchanged.
+Set the effective context percentage to 90% for all models.
+Restore the selected model's default auto-compaction threshold.
+Preview a model catalog refresh from my installed Codex bundled metadata.
+```
+
+Or run from the repository root, replacing `MODEL_ID` with an exact ID returned by `status`:
+
+```text
+python skills/context-window/scripts/context_window.py status
+python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k --preview
+python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --tokens 600k
+python skills/context-window/scripts/context_window.py set --scope global-all --effective-percent 90
+python skills/context-window/scripts/context_window.py set --scope global-model --model MODEL_ID --auto-compact-limit default
+python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled
+python skills/context-window/scripts/context_window.py restore "PATH_TO_BACKUP_MANIFEST"
+```
+
+`--home PATH` goes before the subcommand and selects an isolated configuration directory. Otherwise, the script uses `CODEX_HOME`, falling back to `.codex` under the user directory. `refresh` previews by default; add `--apply` to save a refresh. Bundled refresh requires an installed Codex supporting `debug models --bundled`.
+
+A result of `saved_requires_reload` means the configuration was saved. Open a new chat or reload as appropriate, then inspect actual runtime records to verify the effective context size. `status` and previews are estimates, not proof that a running chat has applied a setting.
+
 
 这是社区项目，与 OpenAI 无隶属关系。修改的是本机 Codex 配置；普通 ChatGPT 云端聊天、其他客户端和单会话设置不在本项目范围内。
 
@@ -20,7 +81,7 @@
 
 ## 安装
 
-需要 Windows、PowerShell 7、已有的本地 Codex 环境及 Python 3.11+。请先确认 `python --version`；若命令指向其他版本，换成你已安装的解释器路径。
+需要 Windows、已有的本地 ChatGPT Work / Codex 环境及 Python 3.11+。不要求 PowerShell 7；可从现有终端（Windows PowerShell、PowerShell 或命令提示符等）调用 Python 脚本。下方安装示例使用 PowerShell 通用命令。请先确认 `python --version`；若命令指向其他版本，换成你已安装的解释器路径。
 
 从 [Releases](https://github.com/1dream1436/codex-context-window-skill/releases) 下载技能 ZIP，将其中的 `context-window` 文件夹放入你的技能目录。也可以克隆仓库：
 
@@ -59,7 +120,7 @@ python skills/context-window/scripts/context_window.py set --scope global-model 
 python skills/context-window/scripts/context_window.py set --scope global-all --auto-compact-limit default
 python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled
 python skills/context-window/scripts/context_window.py refresh --refresh-from-bundled --apply
-python skills/context-window/scripts/context_window.py restore 'PATH_TO_BACKUP_MANIFEST'
+python skills/context-window/scripts/context_window.py restore "PATH_TO_BACKUP_MANIFEST"
 ```
 
 `--home PATH` 放在子命令之前，可在隔离目录操作；省略时使用 `CODEX_HOME`，未设置则使用用户目录下 `.codex`。需要内置刷新时，已有 Codex 必须支持 `debug models --bundled`；不在 PATH 中可加 `--codex` 指定现有程序。

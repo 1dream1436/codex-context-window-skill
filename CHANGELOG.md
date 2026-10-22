@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Documentation - 2026-10-22
+
+- Add an English guide covering ChatGPT Work Local, Codex Local, context token limits, effective percentages, auto-compaction, installation, and runtime verification.
+- Surface the documented 500K/600K desktop results near the README introduction and improve English skill discovery metadata.
+- Remove the unnecessary PowerShell 7 requirement from the README and skill instructions; retain Python 3.11+ as the runtime dependency.
+- No runtime changes; existing release archives still reflect their original tags.
+
 ### Documentation - 2026-10-21
 
 - Document user-operated Work Local / Codex Local window verification: 500K raw → 475K effective, 600K raw → 570K effective in both modes.

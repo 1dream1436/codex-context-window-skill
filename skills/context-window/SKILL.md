@@ -1,6 +1,6 @@
 ---
 name: context-window
-description: GPT专属。在Windows本地ChatGPT Work/Codex中调整全部或指定模型的上下文窗口、有效比例和自动压缩阈值，查询配置、刷新模型目录并备份恢复。不用于单会话、普通Chat云端或其他客户端。
+description: Configure context window token limits, effective context percentages, and auto-compaction thresholds for all or selected models in Windows ChatGPT Work Local and Codex Local. Inspect settings, refresh model catalogs, preview, back up and restore local configuration. 用于调整上下文窗口、有效比例与自动压缩阈值；不用于单会话、普通Chat云端或其他客户端。
 metadata:
   version: 0.4.0
 ---
@@ -28,7 +28,7 @@ metadata:
 
 ## 调用
 
-终端使用PowerShell 7。`scripts/context_window.py`仅依赖Python 3.11+标准库，复用已有Python，不重新安装。先用`status`核对当前目录、全局覆盖、上限、比例、压缩与计数范围。脚本相对技能目录调用；先确认可用的Python 3.11+解释器，不依赖作者机器上的路径。
+使用现有可用终端调用Python脚本，不要求PowerShell 7；Windows PowerShell、PowerShell或命令提示符等均可。`scripts/context_window.py`仅依赖Python 3.11+标准库，复用已有Python，不重新安装。先用`status`核对当前目录、全局覆盖、上限、比例、压缩与计数范围。脚本相对技能目录调用；先确认可用的Python 3.11+解释器，不依赖作者机器上的路径。
 
 示例（python须指向已确认的3.11+解释器；模型id需先核对）：
 
